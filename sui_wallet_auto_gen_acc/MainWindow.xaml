@@ -5,20 +5,82 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:sui_wallet_auto_gen_acc"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="800">
+        Title="Sui Wallet Auto Gen Account"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Height="600"
+        Width="800"
+        MouseDown="Window_MouseDown"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
         </Grid.RowDefinitions>
-        <Button Grid.Row="2" 
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0"
+                   Name="labelChromePath"
+                   Margin="5"
+                   Content="Chrome extention .crx path"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center" />
+            <Button Grid.Column="1"
+                    Content="Select path"
+                    Name="buttonChromePath"
+                    Click="buttonChromePath_Click"
+                    Height="50"
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center" />
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Label Grid.Column="0"
+                   Margin="5"
+                   Name="labelAccountPath"
+                   Content="File accounts.txt path"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center" />
+            <Button Grid.Column="1"
+                    Click="buttonAccountPath_Click"
+                    Content="Select path"
+                    Name="buttonAccountPath"
+                    Height="50"
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center" />
+        </Grid>
+        <Grid Grid.Row="2">
+            <TextBox 
+                Margin="5,0"
+                Name="textboxPassword"
+                materialDesign:HintAssist.Hint="Password for creating account. (default kiepdoden@123)"
+                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                     VerticalAlignment="Center" />
+        </Grid>
+        <Button Grid.Row="3"
                 Content="Start"
                 Width="100"
                 Height="50"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
                 Name="btnSwitch"
-                Click="btnSwitch_Click"/>
+                Click="btnSwitch_Click" />
     </Grid>
 </Window>
