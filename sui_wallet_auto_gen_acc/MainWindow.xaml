@@ -31,12 +31,14 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <Label Grid.Column="0"
-                   Name="labelChromePath"
-                   Margin="5"
-                   Content="Chrome extention .crx path"
-                   VerticalAlignment="Center"
-                   HorizontalAlignment="Center" />
+            <TextBlock Grid.Column="0"
+                       Name="labelChromePath"
+                       Margin="5"
+                       TextWrapping="WrapWithOverflow"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center">
+                Chrome extention .crx path
+            </TextBlock>
             <Button Grid.Column="1"
                     Content="Select path"
                     Name="buttonChromePath"
@@ -51,12 +53,14 @@
                 <ColumnDefinition />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <Label Grid.Column="0"
-                   Margin="5"
-                   Name="labelAccountPath"
-                   Content="File accounts.txt path"
-                   VerticalAlignment="Center"
-                   HorizontalAlignment="Center" />
+            <TextBlock Grid.Column="0"
+                       Name="labelAccountPath"
+                       Margin="5"
+                       TextWrapping="WrapWithOverflow"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center">
+                File accounts.txt path
+            </TextBlock>
             <Button Grid.Column="1"
                     Click="buttonAccountPath_Click"
                     Content="Select path"
@@ -67,10 +71,9 @@
                     HorizontalAlignment="Center" />
         </Grid>
         <Grid Grid.Row="2">
-            <TextBox 
-                Margin="5,0"
-                Name="textboxPassword"
-                materialDesign:HintAssist.Hint="Password for creating account. (default kiepdoden@123)"
+            <TextBox Margin="5,0"
+                     Name="textboxPassword"
+                     materialDesign:HintAssist.Hint="Password for creating account. (default kiepdoden@123)"
                      Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                      VerticalAlignment="Center" />
         </Grid>
