@@ -77,9 +77,20 @@
                                     HorizontalAlignment="Center" />
                         </Grid>
                         <Grid Grid.Row="2">
-                            <TextBox Margin="5,0"
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0"
+                                Margin="5,0"
                                      Name="textboxPassword"
                                      materialDesign:HintAssist.Hint="Password for creating account. (default kiepdoden@123)"
+                                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                     VerticalAlignment="Center" />
+                            <TextBox Grid.Column="1"
+                                     Margin="5,0"
+                                     Name="textboxTimes"
+                                     materialDesign:HintAssist.Hint="Number of accounts (Leave empty to create unlimited account)"
                                      Style="{StaticResource MaterialDesignFloatingHintTextBox}"
                                      VerticalAlignment="Center" />
                         </Grid>
