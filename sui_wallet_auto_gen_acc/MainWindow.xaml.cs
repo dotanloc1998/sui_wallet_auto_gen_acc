@@ -21,16 +21,18 @@ namespace sui_wallet_auto_gen_acc
     {
         #region constants
         private const string SUI_WALLET_CREATE_URL = "chrome-extension://opcgpfmipidbgpenhmajoajpbobppdil/ui.html#/welcome";
-        private const string BUTTON_GET_START_XPATH = "//a[@class='uDUBihzsBafACO5RMGr7 btn primary']";
-        private const string BUTTON_WALLETS_XPATH = "//a[@class='btn MuTCPVF5Yv8Jw2J3JDL1']";
-        private const string BUTTON_MENU_XPATH = "//a[@class='Pxyoz1jJ8wYGMCqDOEMG R0arsswJgfnkyaXeHjjT']";
-        private const string BUTTON_ACCOUNT_CLASS = "M_3pz_0ZtIX322QlPAJr";
-        private const string BUTTON_LOGOUT_CLASS = "Qka29CBKA19ik0cUSlIx";
-        private const string PASSWORD_BOXES_CLASS = "TH2aGaKvkCfbW1zH9HHX";
-        private const string CHECKBOX_ARGEE_CLASS = "MmDbA0GzFptVTURsV5YU";
-        private const string BUTTON_CREATE_XPATH = "//button[@class='qvmPyb8NdzsMrFWoHAEN SH1FDQZ9VX53OguPvdQU Ha6uGJWJ9hrjJCBvvs5T']";
-        private const string RECOVERY_BOX_CLASS = "FcQQKvA6jyUfX4nnitAd";
-        private const string BUTTON_OPEN_WALLET_XPATH = "//button[@class='qvmPyb8NdzsMrFWoHAEN Rje_ybCV053wusA9gaJx SH1FDQZ9VX53OguPvdQU Ha6uGJWJ9hrjJCBvvs5T']";
+        private const string BUTTON_GET_START_XPATH = "/html/body/div/div/div[1]/div/div/div[2]";
+        private const string BUTTON_CREATE_NEW_WALLET_XPATH = "/html/body/div/div/div[1]/div[1]/a";
+        private const string BUTTON_DISPLAY_RECOVERY_PHRASE_XPATH = "/html/body/div/div/div[1]/div[3]/div/div[3]/div[2]/div[2]/button";
+        private const string BUTTON_MENU_XPATH = "/html/body/div/div/div[1]/header/div[3]";
+        private const string BUTTON_LOGOUT_XPATH = "/html/body/div/div/div[1]/div/div/div[2]/div[4]/button[2]";
+        private const string BUTTON_CONFIRM_LOGOUT_XPATH = "/html/body/div[2]/div/div/div/div[2]/div/div[3]/div/button[2]";
+        private const string PASSWORD_BOXES_TAGNAME = "input";
+        private const string CHECKBOX_ARGEE_XPATH = "/html/body/div/div/div[1]/form/div/fieldset/label[3]/span";
+        private const string CHECKBOX_SAVED_PHRASE_XPATH = "/html/body/div/div/div[1]/div[3]/div/div[7]/label/span";
+        private const string BUTTON_CREATE_XPATH = "/html/body/div/div/div[1]/form/button";
+        private const string RECOVERY_BOX_XPATH = "/html/body/div/div/div[1]/div[3]/div/div[3]/div[1]/div[1]/div";
+        private const string BUTTON_OPEN_WALLET_XPATH = "/html/body/div/div/div[1]/div[3]/a";
         private const string COPY = "COPY";
         private const string SUI_WALLET_EXTENSION_FILE_NAME = "opcgpfmipidbgpenhmajoajpbobppdil.crx";
         private const string DEFAULT_ACCOUNT_PASSWORD = "kiepdoden@123";
@@ -96,21 +98,30 @@ namespace sui_wallet_auto_gen_acc
             //Start creating account
             accountPassword = !string.IsNullOrWhiteSpace(textboxPassword.Text.Trim()) ? textboxPassword.Text.Trim() : DEFAULT_ACCOUNT_PASSWORD;
             WriteFile(accountPassword);
-            while (true)
+            bool shouldCreate = string.IsNullOrEmpty(textboxTimes.Text);
+            int numberOfAccounts = 0;
+            int count = 0;
+            if (!shouldCreate) 
             {
+                numberOfAccounts = int.Parse(textboxTimes.Text.Trim());
+            }
+            while (shouldCreate || count < numberOfAccounts)
+            {
+                count++;
                 try
                 {
+                    chromeDriver.Navigate().Refresh();
                     var buttonGetStart = chromeDriver.FindElement(By.XPath(BUTTON_GET_START_XPATH));
                     if (buttonGetStart != null)
                     {
                         buttonGetStart.Click();
                     }
-                    var buttonWallets = chromeDriver.FindElements(By.XPath(BUTTON_WALLETS_XPATH));
-                    if (buttonWallets.Count > 1)
+                    var buttonWallet = chromeDriver.FindElement(By.XPath(BUTTON_CREATE_NEW_WALLET_XPATH));
+                    if (buttonWallet != null)
                     {
-                        buttonWallets[0].Click();
+                        buttonWallet.Click();
                     }
-                    var passwordBoxes = chromeDriver.FindElements(By.ClassName(PASSWORD_BOXES_CLASS));
+                    var passwordBoxes = chromeDriver.FindElements(By.TagName(PASSWORD_BOXES_TAGNAME));
                     if (passwordBoxes.Count > 1)
                     {
                         var createPasswordBox = passwordBoxes[0];
@@ -118,7 +129,7 @@ namespace sui_wallet_auto_gen_acc
                         var confirmPasswordBox = passwordBoxes[1];
                         confirmPasswordBox.SendKeys(accountPassword);
                     }
-                    var checkboxArgee = chromeDriver.FindElement(By.ClassName(CHECKBOX_ARGEE_CLASS));
+                    var checkboxArgee = chromeDriver.FindElement(By.XPath(CHECKBOX_ARGEE_XPATH));
                     if (checkboxArgee != null)
                     {
                         checkboxArgee.Click();
@@ -128,12 +139,22 @@ namespace sui_wallet_auto_gen_acc
                     {
                         buttonCreate.Click();
                     }
-                    var recoveryBox = chromeDriver.FindElement(By.ClassName(RECOVERY_BOX_CLASS));
+                    var buttonDisplayPhrase = chromeDriver.FindElement(By.XPath(BUTTON_DISPLAY_RECOVERY_PHRASE_XPATH));
+                    if (buttonDisplayPhrase != null)
+                    {
+                        buttonDisplayPhrase.Click();
+                    }
+                    var recoveryBox = chromeDriver.FindElement(By.XPath(RECOVERY_BOX_XPATH));
                     if (recoveryBox != null)
                     {
                         string recoveryCode = recoveryBox.Text.Replace(COPY, string.Empty).Replace("  ", " ").Trim();
                         //Init StreamWriter
                         WriteFile(recoveryCode);
+                    }
+                    var checkboxSavedPhrase = chromeDriver.FindElement(By.XPath(CHECKBOX_SAVED_PHRASE_XPATH));
+                    if (checkboxSavedPhrase != null)
+                    {
+                        checkboxSavedPhrase.Click();
                     }
                     var buttonOpenWallet = chromeDriver.FindElement(By.XPath(BUTTON_OPEN_WALLET_XPATH));
                     if (buttonOpenWallet != null)
@@ -145,15 +166,15 @@ namespace sui_wallet_auto_gen_acc
                     {
                         buttonMenu.Click();
                     }
-                    var buttonAccount = chromeDriver.FindElement(By.ClassName(BUTTON_ACCOUNT_CLASS));
-                    if (buttonAccount != null)
-                    {
-                        buttonAccount.Click();
-                    }
-                    var buttonLogout = chromeDriver.FindElement(By.ClassName(BUTTON_LOGOUT_CLASS));
+                    var buttonLogout = chromeDriver.FindElement(By.XPath(BUTTON_LOGOUT_XPATH));
                     if (buttonLogout != null)
                     {
                         buttonLogout.Click();
+                    }
+                    var buttonConfirmLogout = chromeDriver.FindElement(By.XPath(BUTTON_CONFIRM_LOGOUT_XPATH));
+                    if (buttonConfirmLogout != null)
+                    {
+                        buttonConfirmLogout.Click();
                     }
                 }
                 catch (NoSuchWindowException)
