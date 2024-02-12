@@ -3,6 +3,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System;
 using System.IO;
+using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
@@ -37,6 +38,7 @@ namespace sui_wallet_auto_gen_acc
         private const string SUI_WALLET_EXTENSION_FILE_NAME = "opcgpfmipidbgpenhmajoajpbobppdil.crx";
         private const string DEFAULT_ACCOUNT_PASSWORD = "kiepdoden@123";
         private const string ACCOUNT_FILE_NAME = "\\accounts.txt";
+        private const string CORRECT_PASS = "\\password.txt";
         private const double WAIT_FOR_ELEMENT = 5;
         private const string TWITTER_LOGIN_PATH = "https://twitter.com";
         private const string TWITTER_INPUT_XPATH = "//input[@class='r-30o5oe r-1niwhzg r-17gur6a r-1yadl64 r-deolkf r-homxoj r-poiln3 r-7cikom r-1ny4l3l r-t60dpp r-1dz5y72 r-fdjqy7 r-13qz1uu']";
@@ -49,6 +51,14 @@ namespace sui_wallet_auto_gen_acc
         private const string TWITTER_LOGOUT_CONFIRM_BTN_XPATH = "//div[@data-testid='confirmationSheetConfirm']";
         private const string TWITTER_LOGIN_MAIN_BTN_XPATH = "//a[@data-testid='login']";
         private const string TWITTER_LOGIN_MAIN_BTN2_XPATH = "//a[@data-testid='loginButton']";
+        private const string FACEBOOK_URL = "https://www.facebook.com/login";
+        private const string FACEBOOK_INPUT_EMAIL_PHONE_ID = "email";
+        private const string FACEBOOK_INPUT_PASS_ID = "pass";
+        private const string FACEBOOK_BUTTON_LOGIN_XPATH = "/html/body/div[1]/div[1]/div[1]/div/div/div/div[2]/div/div[1]/form/div[2]/button";
+        private const string FACEBOOK_BUTTON_LOGINWITHPASSWORD_XPATH = "/html/body/div[1]/div[1]/div[1]/div/div/form/div/div[3]/div/div[2]/a";
+        private const string FACEBOOK_BUTTON_LOGINWITHPASSWORD_ID = "loginbutton";
+        private const string FACEBOOK_LABEL_FORGOTPASS_XPATH = "/html/body/div[1]/div[1]/div[1]/div/div[2]/div[2]/form/div/div[2]/div[2]/div/div/div/span";
+        private const string FACEBOOK_FORGOTPASS = "Forgotten password?";
         #endregion
 
         private string chromeExtentionPath = string.Empty;
@@ -57,6 +67,8 @@ namespace sui_wallet_auto_gen_acc
         private bool isChromePathSelected;
         private bool isAccountPathSelected;
         private bool isAccountTwitterPathSelected;
+        private bool isAccountFBPathSelected;
+        private string fileAccountFBPath = string.Empty;
         private string accountPassword = string.Empty;
         private string twitterStatus = string.Empty;
         private StreamWriter sw;
@@ -97,11 +109,11 @@ namespace sui_wallet_auto_gen_acc
 
             //Start creating account
             accountPassword = !string.IsNullOrWhiteSpace(textboxPassword.Text.Trim()) ? textboxPassword.Text.Trim() : DEFAULT_ACCOUNT_PASSWORD;
-            WriteFile(accountPassword);
+            WriteFile(fileAccountPath, ACCOUNT_FILE_NAME, accountPassword);
             bool shouldCreate = string.IsNullOrEmpty(textboxTimes.Text);
             int numberOfAccounts = 0;
             int count = 0;
-            if (!shouldCreate) 
+            if (!shouldCreate)
             {
                 numberOfAccounts = int.Parse(textboxTimes.Text.Trim());
             }
@@ -149,7 +161,7 @@ namespace sui_wallet_auto_gen_acc
                     {
                         string recoveryCode = recoveryBox.Text.Replace(COPY, string.Empty).Replace("  ", " ").Trim();
                         //Init StreamWriter
-                        WriteFile(recoveryCode);
+                        WriteFile(fileAccountPath, ACCOUNT_FILE_NAME, recoveryCode);
                     }
                     var checkboxSavedPhrase = chromeDriver.FindElement(By.XPath(CHECKBOX_SAVED_PHRASE_XPATH));
                     if (checkboxSavedPhrase != null)
@@ -212,9 +224,9 @@ namespace sui_wallet_auto_gen_acc
             return chromeDriver;
         }
 
-        private void WriteFile(string content)
+        private void WriteFile(string path, string fileName, string content)
         {
-            sw = new StreamWriter(fileAccountPath + ACCOUNT_FILE_NAME, append: true);
+            sw = new StreamWriter(path + fileName, append: true);
             sw.WriteLine(content);
             sw.Close();
         }
@@ -364,6 +376,73 @@ namespace sui_wallet_auto_gen_acc
             {
                 MessageBox.Show("Please select file contants your twitter accounts.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 isAccountTwitterPathSelected = false;
+            }
+        }
+
+        private void btnStart_Click(object sender, RoutedEventArgs e)
+        {
+            if (!isAccountFBPathSelected)
+            {
+                MessageBox.Show("Please select the accounts file path and try again.", "Start error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            sr = new StreamReader(fileAccountFBPath);
+            ChromeDriver chromeDriver = CreateChromeDriver(null, FACEBOOK_URL);
+            string fbPass;
+            var inputEmailPhone = chromeDriver.FindElement(By.Id(FACEBOOK_INPUT_EMAIL_PHONE_ID));
+            if (inputEmailPhone != null)
+            {
+                inputEmailPhone.SendKeys(textboxEmailOrPhone.Text);
+            }
+            var inputPass = chromeDriver.FindElement(By.Id(FACEBOOK_INPUT_PASS_ID));
+            if (inputPass != null)
+            {
+                inputPass.SendKeys("1234aaa5678*9");
+            }
+            var inputBtnLogin = chromeDriver.FindElement(By.Id(FACEBOOK_BUTTON_LOGINWITHPASSWORD_ID));
+            if (inputBtnLogin != null)
+            {
+                inputBtnLogin.Click();
+            }
+            while ((fbPass = sr.ReadLine()) != null)
+            {
+                inputPass = chromeDriver.FindElement(By.Id(FACEBOOK_INPUT_PASS_ID));
+                if (inputPass != null)
+                {
+                    inputPass.SendKeys(fbPass);
+                }
+
+                inputBtnLogin = chromeDriver.FindElement(By.Id(FACEBOOK_BUTTON_LOGINWITHPASSWORD_ID));
+                if (inputBtnLogin != null)
+                {
+                    inputBtnLogin.Click();
+                }
+                var labelForgotPassword = chromeDriver.FindElement(By.XPath(FACEBOOK_LABEL_FORGOTPASS_XPATH));
+                if (labelForgotPassword != null)
+                {
+                    if (labelForgotPassword.Text != FACEBOOK_FORGOTPASS)
+                    {
+                        WriteFile(fileAccountFBPath, CORRECT_PASS, fbPass);
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void buttonAccountFBPath_Click(object sender, RoutedEventArgs e)
+        {
+            openFileDialog = new OpenFileDialog();
+            DialogResult result = openFileDialog.ShowDialog();
+            if (result == System.Windows.Forms.DialogResult.OK && !string.IsNullOrWhiteSpace(openFileDialog.FileName))
+            {
+                fileAccountFBPath = openFileDialog.FileName;
+                labelAccountFBPath.Text = fileAccountFBPath;
+                isAccountFBPathSelected = true;
+            }
+            else
+            {
+                MessageBox.Show("Please select file contants your facebook passwords.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                isAccountFBPathSelected = false;
             }
         }
     }
