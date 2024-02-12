@@ -1,15 +1,10 @@
-﻿using Microsoft.Win32;
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System;
 using System.IO;
-using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Input;
-using System.Windows.Shapes;
-using static System.Windows.Forms.Design.AxImporter;
-using static System.Windows.Forms.LinkLabel;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = System.Windows.Forms.OpenFileDialog;
 
