@@ -15,8 +15,8 @@
 
   <ItemGroup>
     <PackageReference Include="MaterialDesignThemes" Version="4.9.0" />
-    <PackageReference Include="Selenium.Support" Version="4.13.1" />
-    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="117.0.5938.9200" />
+    <PackageReference Include="Selenium.Support" Version="4.17.0" />
+    <PackageReference Include="Selenium.WebDriver.ChromeDriver" Version="121.0.6167.8500" />
   </ItemGroup>
 
 </Project>

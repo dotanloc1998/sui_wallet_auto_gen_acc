@@ -82,7 +82,7 @@
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
                             <TextBox Grid.Column="0"
-                                Margin="5,0"
+                                     Margin="5,0"
                                      Name="textboxPassword"
                                      materialDesign:HintAssist.Hint="Password for creating account. (default kiepdoden@123)"
                                      Style="{StaticResource MaterialDesignFloatingHintTextBox}"
@@ -134,7 +134,7 @@
                                     HorizontalAlignment="Center" />
                         </Grid>
                         <Grid Grid.Row="1">
-                            <TextBox Margin="5,0"
+                            <TextBox Margin="15,0"
                                      Name="textboxComment"
                                      materialDesign:HintAssist.Hint="Things you wanna say. (default kiepdoden@123)"
                                      Style="{StaticResource MaterialDesignFloatingHintTextBox}"
@@ -148,6 +148,52 @@
                                 HorizontalAlignment="Center"
                                 Name="btnCommentSwitch"
                                 Click="btnCommentSwitch_Click" />
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Facebook">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0"
+                                       Name="labelAccountFBPath"
+                                       Margin="5"
+                                       TextWrapping="WrapWithOverflow"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Center">
+File accounts.txt path
+                            </TextBlock>
+                            <Button Grid.Column="1"
+                                    Content="Select path"
+                                    Name="buttonAccountFBPath"
+                                    Height="50"
+                                    Margin="5"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    Click="buttonAccountFBPath_Click" />
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <TextBox Margin="15,0"
+                                     Name="textboxEmailOrPhone"
+                                     materialDesign:HintAssist.Hint="Email / Phone number"
+                                     Style="{StaticResource MaterialDesignFloatingHintTextBox}"
+                                     VerticalAlignment="Center" />
+                        </Grid>
+                        <Button Grid.Row="2"
+                                Content="Start"
+                                Width="100"
+                                Height="50"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center"
+                                Name="btnStart"
+                                Click="btnStart_Click" />
                     </Grid>
                 </TabItem>
             </TabControl>
